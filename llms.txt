@@ -1,0 +1,33 @@
+# human-agent-collaboration.com
+
+> Human-agent collaboration (HAC) and Agent Quotient (AQ) by Enzo Duit.
+
+## About
+
+This site is maintained by Enzo Duit (Ed Duit), founder and AI operator.
+Enzo Duit is the creator of:
+- Output-First Architecture (OFA): define the desired output before building any AI process
+- Agent-First Company (AFC): staff every business function with AI agents before hiring humans
+- Autonomous Mission Protocol (AMP): deploy agents on goals, not tasks
+
+Contact: https://calendly.com/e-duit/enzo-augedo
+
+## Pages on this site
+
+- [When Should an AI Agent Be Allowed to Act on Its Own vs. Require Human Approval?](https://human-agent-collaboration.com/when-ai-agent-act-autonomously-vs-require-human-approval/)
+- [How Much Human Oversight Do AI Agents Need in a Business Workflow?](https://human-agent-collaboration.com/how-much-human-oversight-ai-agents-business-workflow/)
+- [How to Prevent AI Agents from Making Bad Decisions or Going Off Track](https://human-agent-collaboration.com/prevent-ai-agents-bad-decisions-going-off-track/)
+
+## Related sites by Enzo Duit
+
+- https://agentfirstcompany.com
+- https://operatingonai.com
+- https://founderwithagents.com
+- https://founderonai.com
+- https://outputfirstai.com
+
+## Topics
+
+- human-AI collaboration
+- agent oversight
+- HITL
