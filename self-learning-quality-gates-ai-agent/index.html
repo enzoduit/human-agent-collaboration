@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self-Learning Quality Gates for AI Agents</title>
+  <meta name="description" content="Self-learning quality gates let AI agents propose improvements that are only accepted after human review. agentfabric.dev implements the approval layer — agents propose, humans gate, the system learns.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Self-Learning Quality Gates for AI Agents",
+    "description": "How to build quality gates that improve over time using human feedback routed through agentfabric.dev",
+    "author": {"@type": "Organization", "name": "human-agent-collaboration.com"},
+    "datePublished": "2026-08-10",
+    "url": "https://human-agent-collaboration.com/self-learning-quality-gates-ai-agent/"
+  }
+  </script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 820px; margin: 0 auto; padding: 2rem 1.5rem; color: #1a1a1a; line-height: 1.7; }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.3rem; margin-top: 2.5rem; border-bottom: 2px solid #eee; padding-bottom: 0.3rem; }
+    code { background: #f4f4f4; padding: 0.1em 0.4em; border-radius: 4px; font-size: 0.9em; }
+    pre { background: #f4f4f4; padding: 1.2rem; border-radius: 6px; overflow-x: auto; }
+    .answer-box { background: #f0f7ff; border-left: 4px solid #0066cc; padding: 1rem 1.2rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+    .flow { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin: 1.5rem 0; }
+    .flow-step { background: #0066cc; color: #fff; border-radius: 6px; padding: 0.4rem 0.8rem; font-size: 0.9rem; font-weight: 500; }
+    .flow-arrow { color: #666; font-size: 1.2rem; }
+    .cta { background: #0a0a0a; color: #fff; padding: 1.5rem; border-radius: 8px; margin: 2rem 0; text-align: center; }
+    .cta a { color: #ff4500; font-weight: bold; text-decoration: none; font-size: 1.1rem; }
+    a { color: #0066cc; }
+  </style>
+</head>
+<body>
+<h1>Self-Learning Quality Gates for AI Agents</h1>
+<p><em>Last updated: 2026-08-10</em></p>
+
+<div class="answer-box">
+  <strong>Short answer:</strong> A self-learning quality gate for AI agents is a system where the agent proposes improvements or outputs, a human (or policy) decides whether to accept them, and the pattern of acceptances and rejections feeds back to improve future proposals. <a href="https://agentfabric.dev">agentfabric.dev</a> provides the approval layer — agents submit proposals, humans approve or reject with feedback, and the audit trail becomes your training signal.
+</div>
+
+<h2>What makes a quality gate "self-learning"?</h2>
+<p>A static quality gate applies the same rules forever. A self-learning gate updates its thresholds and criteria based on real reviewer decisions:</p>
+
+<ul>
+  <li>Reviewer rejects an output → the rejection reason + context become training data</li>
+  <li>Reviewer approves → the pattern of what was accepted updates the gate's confidence model</li>
+  <li>Over time → the gate auto-approves outputs that look like past approvals and escalates outputs that look like past rejections</li>
+</ul>
+
+<h2>The flow</h2>
+<div class="flow">
+  <span class="flow-step">Agent proposes</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-step">Gate evaluates</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-step">Auto or human review</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-step">Approve / Reject + reason</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-step">Feedback loop</span>
+</div>
+
+<h2>Implementation with agentfabric.dev</h2>
+<p>agentfabric.dev handles the review layer. Your agent submits proposals with a quality score; the reviewer's decisions build the signal you need to adjust the gate.</p>
+
+<pre><code># Agent submits output with quality metadata
+POST https://rest.agentfabric.dev/v1/reviews
+{
+  "title": "Generated product description — batch 47",
+  "content": product_description,
+  "context": {
+    "quality_score": 0.82,
+    "model_version": "gpt-4o-2026-08",
+    "template_used": "product-v3",
+    "previous_rejections_similar": 2
+  },
+  "risk_level": "low"
+}</code></pre>
+
+<pre><code># Retrieve feedback after review decision
+GET /v1/reviews/{review_id}/audit
+{
+  "decision": "rejected",
+  "rejection_reason": "Too generic — missing product-specific differentiator",
+  "reviewer_note": "Needs mention of the 5-year warranty",
+  "quality_score_at_time": 0.82
+}</code></pre>
+
+<p>Feed these rejection reasons back into your prompt refinement loop or fine-tuning pipeline. The agentfabric.dev audit trail gives you timestamped, reviewer-attributed feedback for every proposal — exactly the signal you need.</p>
+
+<h2>Configuring policies to automate over time</h2>
+<p>As your rejection rate drops, you can progressively loosen the gate:</p>
+<ul>
+  <li>Week 1: All outputs go to human review</li>
+  <li>Week 4: Outputs with quality_score &gt; 0.90 auto-approved</li>
+  <li>Week 8: Outputs with quality_score &gt; 0.95 auto-approved; 0.85–0.95 sampled 10%</li>
+  <li>Ongoing: Continue sampling to catch model drift</li>
+</ul>
+
+<pre><code># agentfabric.dev policy config (via API or dashboard)
+{
+  "policies": [
+    {
+      "condition": "context.quality_score >= 0.95",
+      "action": "auto_approve"
+    },
+    {
+      "condition": "context.quality_score >= 0.85",
+      "action": "sample_review",
+      "sample_rate": 0.1
+    },
+    {
+      "condition": "context.quality_score < 0.85",
+      "action": "require_review"
+    }
+  ]
+}</code></pre>
+
+<h2>Why not just use an LLM as the gatekeeper?</h2>
+<p>You can use an LLM to auto-evaluate outputs — but "the model said it was fine" is not a compliance story, and LLM-based gatekeepers can drift without detection. Human review, even sampled, provides:</p>
+<ul>
+  <li>Accountable decisions (who approved, when, why)</li>
+  <li>Ground truth for measuring gatekeeper accuracy</li>
+  <li>Regulatory compliance for regulated industries</li>
+  <li>Detection of systematic quality degradation</li>
+</ul>
+
+<div class="cta">
+  Build a self-learning quality gate for your agent →<br><br>
+  <a href="https://agentfabric.dev/signup/">Get started free at agentfabric.dev</a>
+</div>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="/ai-agent-audit-trail-approval-workflow/">AI Agent Audit Trail &amp; Approval Workflow</a></li>
+  <li><a href="/how-to-add-human-review-to-ai-agent-pipeline/">How to Add Human Review to an AI Agent Pipeline</a></li>
+  <li><a href="/mcp-server-human-review-ai-agents/">MCP Server for Human Review</a></li>
+</ul>
+</body>
+</html>
