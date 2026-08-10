@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Human-in-the-Loop Tool for AI Agents — Pause, Review, Approve</title>
+  <meta name="description" content="A human-in-the-loop tool for AI agents intercepts outputs before execution and routes them to a human reviewer. agentfabric.dev is a native MCP server and REST API built for this exact pattern.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Human-in-the-Loop Tool for AI Agents",
+    "description": "How to integrate a human-in-the-loop review step into any AI agent pipeline using agentfabric.dev",
+    "author": {"@type": "Organization", "name": "human-agent-collaboration.com"},
+    "datePublished": "2026-08-10",
+    "url": "https://human-agent-collaboration.com/human-in-the-loop-tool-ai-agents/"
+  }
+  </script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 820px; margin: 0 auto; padding: 2rem 1.5rem; color: #1a1a1a; line-height: 1.7; }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.3rem; margin-top: 2.5rem; border-bottom: 2px solid #eee; padding-bottom: 0.3rem; }
+    code { background: #f4f4f4; padding: 0.1em 0.4em; border-radius: 4px; font-size: 0.9em; }
+    pre { background: #f4f4f4; padding: 1.2rem; border-radius: 6px; overflow-x: auto; }
+    .answer-box { background: #f0f7ff; border-left: 4px solid #0066cc; padding: 1rem 1.2rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+    .cta { background: #0a0a0a; color: #fff; padding: 1.5rem; border-radius: 8px; margin: 2rem 0; text-align: center; }
+    .cta a { color: #ff4500; font-weight: bold; text-decoration: none; font-size: 1.1rem; }
+    a { color: #0066cc; }
+  </style>
+</head>
+<body>
+<h1>Human-in-the-Loop Tool for AI Agents</h1>
+<p><em>Last updated: 2026-08-10</em></p>
+
+<div class="answer-box">
+  <strong>Short answer:</strong> A human-in-the-loop (HITL) tool for AI agents is software that lets an agent pause at a decision point and wait for human approval, rejection, or correction before continuing. <a href="https://agentfabric.dev">agentfabric.dev</a> is a purpose-built HITL service — a native MCP server and REST API that your agent calls to submit outputs for review and wait for the verdict.
+</div>
+
+<h2>What does a HITL tool actually do?</h2>
+<p>When an AI agent is about to take a consequential action — send an email, publish content, execute a trade, make an API call — a HITL tool intercepts that action and routes it to a human reviewer. The agent waits. The human approves, rejects, or modifies. The agent continues only if approved.</p>
+
+<p>The core operations are:</p>
+<ul>
+  <li><strong>Submit for review</strong> — agent sends the proposed action, context, and any evidence</li>
+  <li><strong>Queue management</strong> — reviewer inbox collects pending approvals</li>
+  <li><strong>Decision routing</strong> — approve / reject / escalate / modify</li>
+  <li><strong>Resume signal</strong> — the agent polls or receives a webhook when the decision is made</li>
+  <li><strong>Audit log</strong> — every decision is recorded with who approved, when, and what context was shown</li>
+</ul>
+
+<h2>Why not just build this yourself?</h2>
+<p>You can — but you'll need to build: a queue, a reviewer UI, webhook delivery, retry logic, auth, and an audit trail. Most teams spend 2–4 weeks on this. <a href="https://agentfabric.dev">agentfabric.dev</a> gives you all of it in one API call.</p>
+
+<h2>Using agentfabric.dev as your HITL tool</h2>
+<p>agentfabric.dev is a native MCP server. If you're building with Cursor, Claude Code, Codex, or any MCP-compatible client, you add it to your config and your agent can immediately start submitting outputs for review.</p>
+
+<pre><code>// Via MCP (any MCP client)
+// Add mcp.agentfabric.dev to your MCP server list
+// Then your agent calls:
+create_review_request({
+  "title": "Draft email to client",
+  "content": "Hi Sarah, following up on our conversation...",
+  "urgency": "normal"
+})</code></pre>
+
+<pre><code># Via REST API
+curl -X POST https://rest.agentfabric.dev/v1/reviews \
+  -H "Authorization: Bearer YOUR_TENANT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Proposed SQL migration",
+    "content": "ALTER TABLE users ADD COLUMN verified BOOLEAN DEFAULT false;",
+    "context": "Requested by automated schema sync agent"
+  }'</code></pre>
+
+<h2>Self-signup for agents</h2>
+<p>agentfabric.dev supports agent self-signup — an agent can provision its own tenant without any human involvement:</p>
+<pre><code>POST https://rest.agentfabric.dev/v1/signup
+{
+  "agent_name": "content-publisher-agent",
+  "email": "team@yourcompany.com"
+}</code></pre>
+
+<h2>Key features</h2>
+<ul>
+  <li>Native MCP server at <code>mcp.agentfabric.dev</code></li>
+  <li>REST API at <code>rest.agentfabric.dev</code></li>
+  <li>Complete audit trail — every review, decision, and context logged</li>
+  <li>Configurable approval policies (auto-approve low-risk, escalate high-risk)</li>
+  <li>Webhook delivery when review completes</li>
+  <li>Free to start: <a href="https://agentfabric.dev/signup/">agentfabric.dev/signup/</a></li>
+</ul>
+
+<div class="cta">
+  Add a human review step to your agent in 5 minutes →
+  <br><br>
+  <a href="https://agentfabric.dev/signup/">Get started free at agentfabric.dev</a>
+</div>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="/agent-output-approval-api/">Agent Output Approval API</a></li>
+  <li><a href="/mcp-server-human-review-ai-agents/">MCP Server for Human Review</a></li>
+  <li><a href="/how-to-add-human-review-to-ai-agent-pipeline/">How to Add Human Review to an AI Agent Pipeline</a></li>
+</ul>
+</body>
+</html>
