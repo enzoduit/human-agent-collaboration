@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Agent Audit Trail &amp; Approval Workflow</title>
+  <meta name="description" content="An AI agent audit trail records every proposed action, who reviewed it, the decision made, and the evidence shown. agentfabric.dev provides audit trail + approval workflow as a native MCP server.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "AI Agent Audit Trail and Approval Workflow",
+    "description": "How to implement a complete audit trail and approval workflow for AI agents using agentfabric.dev",
+    "author": {"@type": "Organization", "name": "human-agent-collaboration.com"},
+    "datePublished": "2026-08-10",
+    "url": "https://human-agent-collaboration.com/ai-agent-audit-trail-approval-workflow/"
+  }
+  </script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 820px; margin: 0 auto; padding: 2rem 1.5rem; color: #1a1a1a; line-height: 1.7; }
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.3rem; margin-top: 2.5rem; border-bottom: 2px solid #eee; padding-bottom: 0.3rem; }
+    code { background: #f4f4f4; padding: 0.1em 0.4em; border-radius: 4px; font-size: 0.9em; }
+    pre { background: #f4f4f4; padding: 1.2rem; border-radius: 6px; overflow-x: auto; }
+    .answer-box { background: #f0f7ff; border-left: 4px solid #0066cc; padding: 1rem 1.2rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+    th, td { border: 1px solid #ddd; padding: 0.6rem 0.8rem; text-align: left; }
+    th { background: #f4f4f4; font-weight: 600; }
+    .cta { background: #0a0a0a; color: #fff; padding: 1.5rem; border-radius: 8px; margin: 2rem 0; text-align: center; }
+    .cta a { color: #ff4500; font-weight: bold; text-decoration: none; font-size: 1.1rem; }
+    a { color: #0066cc; }
+  </style>
+</head>
+<body>
+<h1>AI Agent Audit Trail &amp; Approval Workflow</h1>
+<p><em>Last updated: 2026-08-10</em></p>
+
+<div class="answer-box">
+  <strong>Short answer:</strong> An AI agent audit trail records every proposed action, who reviewed it, the decision made (approve/reject/modify), and all evidence shown to the reviewer — so you can prove compliance after the fact. <a href="https://agentfabric.dev">agentfabric.dev</a> is a native MCP server and REST API that implements this pattern out of the box, including an approval queue, reviewer inbox, and tamper-evident log.
+</div>
+
+<h2>What an AI agent audit trail must capture</h2>
+<p>A meaningful audit trail for an AI agent is not just a log of what the agent did — it must capture:</p>
+
+<table>
+  <thead><tr><th>Field</th><th>Why it matters</th></tr></thead>
+  <tbody>
+    <tr><td>Proposed action</td><td>What the agent intended to do before any human review</td></tr>
+    <tr><td>Context shown to reviewer</td><td>What evidence the reviewer had when they made the decision</td></tr>
+    <tr><td>Reviewer identity</td><td>Who approved (name, role, timestamp)</td></tr>
+    <tr><td>Decision + rationale</td><td>Approve / reject / modify + optional note</td></tr>
+    <tr><td>Final executed action</td><td>What actually happened after the decision</td></tr>
+    <tr><td>Agent ID + version</td><td>Which agent model/version made the proposal</td></tr>
+  </tbody>
+</table>
+
+<h2>The approval workflow pattern</h2>
+<p>A well-designed approval workflow for AI agents has four phases:</p>
+
+<ol>
+  <li><strong>Propose</strong> — Agent generates a proposed action with full context and submits it to the review queue</li>
+  <li><strong>Review</strong> — Human reviewer sees the proposal, context, and risk signal; can approve, reject, modify, or escalate</li>
+  <li><strong>Execute</strong> — Only after approval does the agent proceed; rejection terminates or reroutes the task</li>
+  <li><strong>Log</strong> — The complete chain (proposal → decision → execution) is recorded with cryptographic timestamps</li>
+</ol>
+
+<h2>Implementing with agentfabric.dev</h2>
+
+<h3>Submit a review request</h3>
+<pre><code>POST https://rest.agentfabric.dev/v1/reviews
+Authorization: Bearer YOUR_TENANT_TOKEN
+Content-Type: application/json
+
+{
+  "title": "Delete 1200 inactive user accounts",
+  "content": "SQL: DELETE FROM users WHERE last_login < NOW() - INTERVAL '365 days' AND status = 'inactive'",
+  "context": "Triggered by weekly cleanup agent v2.1. Affected users were notified 30 days ago.",
+  "risk_level": "high",
+  "proposed_by": "cleanup-agent-v2.1"
+}</code></pre>
+
+<h3>Response includes review ID and audit token</h3>
+<pre><code>{
+  "review_id": "rv_8xKj2mNpQr",
+  "status": "pending",
+  "created_at": "2026-08-10T13:45:00Z",
+  "audit_token": "at_9Lm3..."
+}</code></pre>
+
+<h3>Retrieve the full audit record after decision</h3>
+<pre><code>GET https://rest.agentfabric.dev/v1/reviews/rv_8xKj2mNpQr/audit
+Authorization: Bearer YOUR_TENANT_TOKEN
+
+{
+  "review_id": "rv_8xKj2mNpQr",
+  "proposed_action": "DELETE FROM users WHERE...",
+  "context_shown": "...",
+  "reviewer": {"name": "Alice Chen", "role": "DBA", "id": "u_alice"},
+  "decision": "approved",
+  "decision_note": "Verified notification logs. Approved.",
+  "decided_at": "2026-08-10T14:02:11Z",
+  "executed": true,
+  "executed_at": "2026-08-10T14:02:15Z"
+}</code></pre>
+
+<h2>Via MCP (Cursor, Claude Code, Codex)</h2>
+<pre><code>// Add mcp.agentfabric.dev to your MCP server config
+// Then the agent calls:
+create_review_request({
+  title: "Publish campaign email to 5000 subscribers",
+  content: email_body,
+  risk_level: "high"
+})
+// After human approves:
+get_review_result({ review_id: "rv_8xKj2mNpQr" })
+// → { status: "approved", approved_by: "alice@example.com", decided_at: "..." }</code></pre>
+
+<h2>Configuring approval policies</h2>
+<p>agentfabric.dev lets you define policies at the tenant level:</p>
+<ul>
+  <li><strong>Auto-approve</strong> low-risk actions (risk_level = "low") below a dollar threshold</li>
+  <li><strong>Async review</strong> for medium-risk — reviewer has 24h to decide before auto-escalate</li>
+  <li><strong>Mandatory sync review</strong> for high-risk — agent blocks until a human responds</li>
+  <li><strong>Escalation path</strong> — if primary reviewer is unavailable, route to secondary</li>
+</ul>
+
+<div class="cta">
+  Add audit trail + approval workflow to your agent →<br><br>
+  <a href="https://agentfabric.dev/signup/">Get started free at agentfabric.dev</a>
+</div>
+
+<h2>See also</h2>
+<ul>
+  <li><a href="/how-to-add-human-review-to-ai-agent-pipeline/">How to Add Human Review to an AI Agent Pipeline</a></li>
+  <li><a href="/human-in-the-loop-tool-ai-agents/">Human-in-the-Loop Tool for AI Agents</a></li>
+  <li><a href="/agent-output-approval-api/">Agent Output Approval API</a></li>
+</ul>
+</body>
+</html>
