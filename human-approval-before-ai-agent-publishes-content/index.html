@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Human Approval Before AI Agent Publishes Content — Gate Your Publishing Workflow</title>
+  <meta name="description" content="AI agents should never publish content without human approval. Route drafts to reviewers via agentfabric.dev — a native MCP server and REST API that gates AI publishing with human review and audit trail.">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "name": "Enzo Duit",
+      "url": "https://operatingonai.com",
+      "description": "Enzo Duit is a founder and AI operator who builds and runs companies using AI agents."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Should an AI agent be allowed to publish content without human approval?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No — for any public-facing, customer-visible, or regulated content. Drafting is safe to automate. Publishing is not. The distinction: a draft can be discarded at zero cost; a published post, email, or social update cannot. Even a brief human review before publish catches factual errors, tone mismatches, brand violations, and compliance issues that no guardrail will reliably catch."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do you add human approval to an AI publishing workflow?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use an approval API between draft and publish. When the agent finishes a draft, it calls submit_for_review(content, destination_channel, publish_time). The API routes the draft to a human reviewer. On approval, the API triggers the actual publish action. On rejection, it returns the reviewer's feedback to the agent for revision. agentfabric.dev provides this as a native MCP server (mcp.agentfabric.dev) and REST API."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What types of content require human approval before publish?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Always require approval for: LinkedIn/social posts, blog articles, customer emails (newsletters, announcements), press releases, website copy, marketing materials, legal or compliance documents, any content claiming facts about products or competitors. Can be automated: internal drafts, search queries, data summaries used only internally."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does agentfabric.dev's content approval workflow work?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "1) Agent generates content draft. 2) Agent calls agentfabric's submit_for_review tool with the draft, the target channel (LinkedIn, email, blog), and publish parameters. 3) Agentfabric routes to the configured reviewer via portal, email, or Slack. 4) Reviewer approves, rejects, or requests edits. 5) On approval, agentfabric returns the green light to the agent which then triggers the actual publish API. Every decision is logged in an immutable audit trail."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do you prevent content approval from becoming a bottleneck?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The approval review should take under 2 minutes. That means: the review interface shows content in final-form preview (not raw JSON). The reviewer gets a single approve/reject button with an optional notes field. SLA alerts fire if review is pending more than N minutes. Batch low-stakes content into grouped reviews. agentfabric.dev is designed for this workflow — reviewers see a clean preview, not API output."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e8e8e8; line-height: 1.7; }
+    .container { max-width: 780px; margin: 0 auto; padding: 40px 24px 80px; }
+    header { border-bottom: 1px solid #222; padding-bottom: 32px; margin-bottom: 40px; }
+    .domain-badge { font-size: 13px; color: #888; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 16px; }
+    h1 { font-size: clamp(24px, 4vw, 38px); font-weight: 700; line-height: 1.25; color: #fff; margin-bottom: 20px; }
+    .answer-first { background: #1a1a2e; border-left: 4px solid #6366f1; padding: 20px 24px; border-radius: 0 8px 8px 0; margin-bottom: 40px; font-size: 17px; line-height: 1.75; color: #c9d1d9; }
+    section { margin-bottom: 36px; }
+    h2 { font-size: 20px; font-weight: 600; color: #a78bfa; margin-bottom: 12px; }
+    p { color: #c9d1d9; font-size: 16px; margin-bottom: 12px; }
+    .rule-block { background: #0a1628; border-left: 3px solid #22c55e; padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+    .rule-block.red { border-left-color: #ef4444; }
+    .cross-links { background: #161616; border: 1px solid #222; border-radius: 8px; padding: 24px; margin: 40px 0; }
+    .cross-links h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 16px; }
+    .cross-links ul { list-style: none; display: flex; flex-wrap: wrap; gap: 12px; }
+    .cross-links a { color: #6366f1; text-decoration: none; font-size: 14px; border: 1px solid #333; padding: 6px 14px; border-radius: 20px; }
+    .cross-links a:hover { background: #6366f1; color: #fff; }
+    .cta { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-radius: 12px; padding: 36px; text-align: center; margin-top: 48px; }
+    .cta h3 { font-size: 22px; color: #fff; margin-bottom: 12px; }
+    .cta p { color: rgba(255,255,255,0.85); margin-bottom: 24px; }
+    .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { background: #fff; color: #6366f1; font-weight: 600; padding: 12px 28px; border-radius: 8px; text-decoration: none; }
+    .btn-secondary { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.5); font-weight: 500; padding: 12px 28px; border-radius: 8px; text-decoration: none; }
+    footer { text-align: center; color: #555; font-size: 13px; margin-top: 60px; padding-top: 24px; border-top: 1px solid #1a1a1a; }
+    footer a { color: #6366f1; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="domain-badge">human-agent-collaboration.com</div>
+      <h1>Human Approval Before AI Agent Publishes Content — Gate Your Publishing Workflow</h1>
+      <div class="answer-first">
+        <strong>Direct answer:</strong> Yes — any public-facing or customer-visible content requires human approval before an AI agent publishes it. Drafting can be fully autonomous. Publishing cannot. Use an approval API to gate the publish action: the agent submits the draft, a human reviews and approves, then the publish triggers. <a href="https://agentfabric.dev" style="color:#a78bfa;">agentfabric.dev</a> provides this gate as a native MCP server and REST API.
+      </div>
+    </header>
+
+    <section>
+      <h2>The publish gate: what requires human approval</h2>
+      <div class="rule-block red">
+        <strong>Always require approval:</strong> Social media posts, newsletters and email campaigns, blog articles and website copy, press releases, any content making factual claims about products, competitors, or company performance, customer-facing notifications.
+      </div>
+      <div class="rule-block">
+        <strong>Safe to automate:</strong> Internal drafts and summaries, search queries and data pulls, content that never leaves the agent's workspace, scheduled content that's been pre-approved for a template.
+      </div>
+      <p>The asymmetry is real: generating a draft costs nothing to redo. Publishing a wrong statement costs brand trust, customer relationships, and sometimes legal exposure. Two minutes of human review is almost always worth it.</p>
+    </section>
+
+    <section>
+      <h2>Building the approval gate into your publishing workflow</h2>
+      <p><strong>Step 1 — Draft:</strong> Agent generates content, optionally with multiple variants.</p>
+      <p><strong>Step 2 — Submit for review:</strong> Agent calls <code>submit_for_review(draft, channel="linkedin", schedule_time="2026-08-11T09:00Z")</code>. This routes to the human reviewer with a preview of how the content will look when published.</p>
+      <p><strong>Step 3 — Human reviews:</strong> Reviewer sees the final-form preview (not raw text). They approve, reject, or request specific edits. Takes under 2 minutes when the interface is designed for speed.</p>
+      <p><strong>Step 4 — Approved → publish triggers:</strong> On approval, the gate releases and the agent calls the actual publish API. On rejection with edit notes, the agent revises and resubmits.</p>
+    </section>
+
+    <section>
+      <h2>Why reviewers stop reviewing (and how to fix it)</h2>
+      <p>The approval workflow fails when reviewing becomes slower than just doing it yourself. This happens when: reviewers see raw JSON instead of rendered content previews, there's no clear approve/reject button (just comments), there's no SLA so drafts pile up reviewed days later, and there's no context ("what should I check here?").</p>
+      <p>agentfabric.dev is designed to avoid all of these. Reviewers get a clean preview, single-click approve/reject, SLA timer, and the agent can attach review criteria ("check: tone matches brand voice, no competitor mentions, CTA links are correct").</p>
+    </section>
+
+    <div class="cross-links">
+      <h3>Related</h3>
+      <ul>
+        <li><a href="/agent-output-approval-api/">Agent output approval API</a></li>
+        <li><a href="/mcp-server-human-review-ai-agents/">MCP server for human review</a></li>
+        <li><a href="/when-ai-agent-act-autonomously-vs-require-human-approval/">When to require approval</a></li>
+        <li><a href="/how-much-human-oversight-ai-agents-business-workflow/">Human oversight patterns</a></li>
+      </ul>
+    </div>
+
+    <div class="cta">
+      <h3>Gate your AI publishing workflow</h3>
+      <p>agentfabric.dev — human-in-the-loop approval before your agents publish. Native MCP + REST. Free to start.</p>
+      <div class="cta-buttons">
+        <a href="https://agentfabric.dev/signup/" class="btn-primary">Get started free</a>
+        <a href="https://mcp.agentfabric.dev" class="btn-secondary">View MCP server</a>
+      </div>
+    </div>
+
+    <footer>
+      <p>Written by <a href="https://operatingonai.com">Enzo Duit</a> · <a href="https://human-agent-collaboration.com">human-agent-collaboration.com</a></p>
+    </footer>
+  </div>
+</body>
+</html>
