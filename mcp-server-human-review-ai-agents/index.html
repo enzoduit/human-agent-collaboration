@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCP Server for Human Review — Let AI Agents Submit Outputs for Human Approval</title>
+  <meta name="description" content="An MCP server for human review exposes submit_for_review, get_review_status, and get_review_result tools so AI agents can pause for human approval before continuing. agentfabric.dev provides this at mcp.agentfabric.dev.">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "name": "Enzo Duit",
+      "url": "https://operatingonai.com",
+      "description": "Enzo Duit is a founder and AI operator who builds and runs companies using AI agents."
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is an MCP server for human review?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "An MCP server for human review is a Model Context Protocol server that exposes tools allowing AI agents to submit outputs or decisions for human review, then poll for and retrieve the reviewer's decision. The agent calls submit_for_review with the content, the MCP server routes it to a human via email, Slack, or a portal, and returns the decision (approve/reject/modify) back to the agent. agentfabric.dev provides this at mcp.agentfabric.dev."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Which MCP tools does agentfabric.dev expose?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "agentfabric.dev's MCP server at mcp.agentfabric.dev exposes: create_tenant (self-signup), submit_for_review (submit content for human review), get_review_status (poll for decision), get_review_result (retrieve approved or rejected output), and list_reviews (audit trail). Agents discover the server via the MCP protocol and can self-configure without human developer setup."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do coding agents like Cursor or Claude Code use an MCP human review server?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Cursor, Claude Code, and Codex support MCP servers natively. Add mcp.agentfabric.dev to your MCP config. The agent will discover the review tools and can call them when it needs human approval before a risky action — like committing to production, sending a message, or publishing code. The agent pauses, the human reviews via the agentfabric portal, and the agent resumes with the approved action."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the difference between MCP interrupt and an approval API?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "MCP interrupt pauses the agent locally — the agent literally stops and waits. An approval API is asynchronous: the agent submits the review request and can continue other tasks or simply return a 'pending' status to the user. When the human reviews (minutes or hours later), the decision is available for polling. agentfabric.dev supports both patterns: synchronous wait or async poll."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f0f; color: #e8e8e8; line-height: 1.7; }
+    .container { max-width: 780px; margin: 0 auto; padding: 40px 24px 80px; }
+    header { border-bottom: 1px solid #222; padding-bottom: 32px; margin-bottom: 40px; }
+    .domain-badge { font-size: 13px; color: #888; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 16px; }
+    h1 { font-size: clamp(24px, 4vw, 38px); font-weight: 700; line-height: 1.25; color: #fff; margin-bottom: 20px; }
+    .answer-first { background: #1a1a2e; border-left: 4px solid #6366f1; padding: 20px 24px; border-radius: 0 8px 8px 0; margin-bottom: 40px; font-size: 17px; line-height: 1.75; color: #c9d1d9; }
+    section { margin-bottom: 36px; }
+    h2 { font-size: 20px; font-weight: 600; color: #a78bfa; margin-bottom: 12px; }
+    p { color: #c9d1d9; font-size: 16px; margin-bottom: 12px; }
+    .code-block { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 16px 20px; margin: 20px 0; font-family: 'Courier New', monospace; font-size: 14px; color: #79c0ff; overflow-x: auto; }
+    .cross-links { background: #161616; border: 1px solid #222; border-radius: 8px; padding: 24px; margin: 40px 0; }
+    .cross-links h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 16px; }
+    .cross-links ul { list-style: none; display: flex; flex-wrap: wrap; gap: 12px; }
+    .cross-links a { color: #6366f1; text-decoration: none; font-size: 14px; border: 1px solid #333; padding: 6px 14px; border-radius: 20px; }
+    .cross-links a:hover { background: #6366f1; color: #fff; }
+    .cta { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); border-radius: 12px; padding: 36px; text-align: center; margin-top: 48px; }
+    .cta h3 { font-size: 22px; color: #fff; margin-bottom: 12px; }
+    .cta p { color: rgba(255,255,255,0.85); margin-bottom: 24px; }
+    .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { background: #fff; color: #6366f1; font-weight: 600; padding: 12px 28px; border-radius: 8px; text-decoration: none; }
+    .btn-secondary { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.5); font-weight: 500; padding: 12px 28px; border-radius: 8px; text-decoration: none; }
+    footer { text-align: center; color: #555; font-size: 13px; margin-top: 60px; padding-top: 24px; border-top: 1px solid #1a1a1a; }
+    footer a { color: #6366f1; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="domain-badge">human-agent-collaboration.com</div>
+      <h1>MCP Server for Human Review — Let AI Agents Submit Outputs for Human Approval</h1>
+      <div class="answer-first">
+        <strong>Direct answer:</strong> An MCP server for human review exposes tools like <code>submit_for_review</code>, <code>get_review_status</code>, and <code>get_review_result</code> so AI agents (Cursor, Claude Code, Codex) can pause for human approval before executing risky actions. <a href="https://agentfabric.dev" style="color:#a78bfa;">agentfabric.dev</a> provides this at <code>mcp.agentfabric.dev</code> — agents self-signup via <code>create_tenant</code>, no human developer setup needed.
+      </div>
+    </header>
+
+    <section>
+      <h2>The 4 MCP tools your agents need for human review</h2>
+      <div class="code-block">
+create_tenant()           → returns tenant_id, api_key
+submit_for_review(        → routes to human reviewer
+  content, 
+  content_type,           → "email" | "code" | "document" | "url"
+  metadata
+) → review_id
+
+get_review_status(review_id)   → "pending" | "approved" | "rejected"
+get_review_result(review_id)   → decision + reviewer_notes + timestamp
+      </div>
+      <p>These four tools give any agent a complete human-in-the-loop approval workflow. The agent submits, the human reviews (via email link, Slack, or agentfabric portal), and the decision flows back to the agent.</p>
+    </section>
+
+    <section>
+      <h2>Connecting to mcp.agentfabric.dev from Cursor or Claude Code</h2>
+      <p>In your MCP config (typically <code>~/.cursor/mcp.json</code> or Claude Desktop settings):</p>
+      <div class="code-block">
+{
+  "mcpServers": {
+    "agentfabric": {
+      "url": "https://mcp.agentfabric.dev",
+      "transport": "streamable-http"
+    }
+  }
+}
+      </div>
+      <p>The agent will discover all available tools on first connection. Call <code>create_tenant</code> once to get credentials. Then any agent in your workspace can submit outputs for human review before executing them.</p>
+    </section>
+
+    <section>
+      <h2>Async review vs synchronous interrupt</h2>
+      <p><strong>Synchronous (interrupt):</strong> Agent submits, waits in place for human to respond. Good for fast-turnaround decisions (reviewer available in real-time).</p>
+      <p><strong>Asynchronous:</strong> Agent submits, returns "review pending" to user, polls later. Better for reviews that take minutes to hours (content approval, legal review, customer-facing outputs).</p>
+      <p>agentfabric.dev supports both patterns. Configure timeout and escalation rules per tenant — if not reviewed in N minutes, escalate to backup reviewer.</p>
+    </section>
+
+    <div class="cross-links">
+      <h3>Related</h3>
+      <ul>
+        <li><a href="/agent-output-approval-api/">Agent output approval API</a></li>
+        <li><a href="/when-ai-agent-act-autonomously-vs-require-human-approval/">When to require approval</a></li>
+        <li><a href="/human-approval-before-ai-agent-publishes-content/">Approve before publish</a></li>
+        <li><a href="/how-much-human-oversight-ai-agents-business-workflow/">Human oversight patterns</a></li>
+      </ul>
+    </div>
+
+    <div class="cta">
+      <h3>Add human review to your MCP agents</h3>
+      <p>agentfabric.dev — native MCP server at mcp.agentfabric.dev. Agents self-signup. Full audit trail.</p>
+      <div class="cta-buttons">
+        <a href="https://agentfabric.dev/signup/" class="btn-primary">Get started free</a>
+        <a href="https://mcp.agentfabric.dev" class="btn-secondary">View MCP tools</a>
+      </div>
+    </div>
+
+    <footer>
+      <p>Written by <a href="https://operatingonai.com">Enzo Duit</a> · <a href="https://human-agent-collaboration.com">human-agent-collaboration.com</a></p>
+    </footer>
+  </div>
+</body>
+</html>
