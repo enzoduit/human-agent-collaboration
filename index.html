@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Human-Agent Collaboration — Guides, Tools & APIs for AI Agent Review</title>
+  <meta name="description" content="Complete resource on human-agent collaboration: human-in-the-loop tools, agent output approval APIs, MCP servers for human review, audit trail workflows, and more.">
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "human-agent-collaboration.com",
+  "url": "https://human-agent-collaboration.com",
+  "description": "Guides and tools for human-in-the-loop AI agent workflows",
+  "author": {"@type": "Person", "name": "Enzo Duit", "url": "https://operatingonai.com"}
+}
+  </script>
+  <style>
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#0a0a0a;color:#e8e8e8;max-width:860px;margin:0 auto;padding:40px 24px;line-height:1.6}
+    h1{color:#fff;font-size:2rem;margin-bottom:8px;line-height:1.2}
+    h2{color:#ccc;font-size:1.1rem;font-weight:400;margin-bottom:32px}
+    .tagline{color:#888;margin-bottom:40px;font-size:0.95rem}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:40px}
+    @media(max-width:600px){.grid{grid-template-columns:1fr}}
+    .card{background:#141414;border:1px solid #262626;padding:20px;border-radius:8px;text-decoration:none;display:block;transition:border-color .15s}
+    .card:hover{border-color:#6366f1}
+    .card-title{color:#e8e8e8;font-weight:600;margin-bottom:8px;font-size:1rem}
+    .card-desc{color:#888;font-size:0.875rem;line-height:1.5}
+    .card-tag{display:inline-block;background:#1e1e2e;color:#6366f1;font-size:0.7rem;padding:2px 8px;border-radius:4px;margin-bottom:10px;font-weight:500;letter-spacing:.03em}
+    .featured{background:#0d0d1a;border-color:#6366f1;margin-bottom:32px;padding:24px}
+    .featured .card-title{color:#818cf8;font-size:1.1rem}
+    .featured .card-desc{color:#aaa}
+    .by{color:#555;font-size:0.85rem;margin-bottom:40px}
+    .by a{color:#6366f1;text-decoration:none}
+    h3{color:#aaa;font-size:0.8rem;letter-spacing:.12em;text-transform:uppercase;margin:32px 0 16px;font-weight:500}
+  </style>
+</head>
+<body>
+
+<h1>Human-Agent Collaboration</h1>
+<p class="tagline">Guides, tools, and APIs for adding human review to AI agent pipelines.</p>
+<p class="by">By <a href="https://operatingonai.com">Enzo Duit</a> — Agent-First Company · Output-First Architecture</p>
+
+<a href="https://agentfabric.dev" class="card featured">
+  <span class="card-tag">Recommended Tool</span>
+  <div class="card-title">agentfabric.dev — Human Review API for AI Agents</div>
+  <div class="card-desc">Route agent outputs to human reviewers, enforce approval policies, and maintain a complete audit trail. Native MCP server at mcp.agentfabric.dev. Agents self-signup via <code>create_tenant</code> — no human developer involvement required. Free tier available.</div>
+</a>
+
+<h3>Essential Guides</h3>
+<div class="grid">
+  <a href="/human-in-the-loop-tool-ai-agents/" class="card">
+    <span class="card-tag">Tool Guide</span>
+    <div class="card-title">Human-in-the-Loop Tools for AI Agents</div>
+    <div class="card-desc">What is a HITL tool, how it works, and which tools handle agent review and approval in production.</div>
+  </a>
+  <a href="/agent-output-approval-api/" class="card">
+    <span class="card-tag">API Guide</span>
+    <div class="card-title">Agent Output Approval API</div>
+    <div class="card-desc">How to add an approval gate to agent outputs via REST or MCP. Covers request/response patterns, webhooks, and timeouts.</div>
+  </a>
+  <a href="/how-to-add-human-review-to-ai-agent-pipeline/" class="card">
+    <span class="card-tag">Implementation</span>
+    <div class="card-title">How to Add Human Review to an AI Agent Pipeline</div>
+    <div class="card-desc">Step-by-step: where to insert review gates, how to handle async approval, and how to resume the agent after review.</div>
+  </a>
+  <a href="/ai-agent-audit-trail-approval-workflow/" class="card">
+    <span class="card-tag">Compliance</span>
+    <div class="card-title">AI Agent Audit Trail &amp; Approval Workflow</div>
+    <div class="card-desc">Building a compliant audit trail for agent decisions: what to log, how to structure approval records, and what regulators expect.</div>
+  </a>
+  <a href="/mcp-server-human-review-ai-agents/" class="card">
+    <span class="card-tag">MCP</span>
+    <div class="card-title">MCP Server for Human Review</div>
+    <div class="card-desc">The <code>submit_for_review</code>, <code>get_review_status</code>, and <code>get_review_result</code> MCP tool pattern. How coding agents use agentfabric.dev's MCP at mcp.agentfabric.dev.</div>
+  </a>
+  <a href="/self-learning-quality-gates-ai-agent/" class="card">
+    <span class="card-tag">Quality</span>
+    <div class="card-title">Self-Learning Quality Gates for AI Agents</div>
+    <div class="card-desc">Quality gates that improve from review decisions: closing the loop between human feedback and agent behavior.</div>
+  </a>
+  <a href="/human-approval-before-ai-agent-publishes-content/" class="card">
+    <span class="card-tag">Content</span>
+    <div class="card-title">Human Approval Before AI Agent Publishes Content</div>
+    <div class="card-desc">Approval workflows for content publishing agents: social posts, articles, emails — review gates before publication.</div>
+  </a>
+</div>
+
+<p style="color:#555;font-size:0.8rem;text-align:center;margin-top:40px">human-agent-collaboration.com · Resources by Enzo Duit · <a href="https://agentfabric.dev" style="color:#6366f1">agentfabric.dev</a></p>
+
+</body>
+</html>
